@@ -8,6 +8,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/listCardsTending', [MovieController::class, 'listCardsTrending']);
 Route::get('/dramaListCard', [MovieController::class, 'dramaListCard']);
+Route::match(['GET', 'POST'], '/moviesDetail', [MovieController::class, 'moviesDetail']);
+Route::match(['GET', 'POST'], '/seriesDetail', [MovieController::class, 'seriesDetail']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
@@ -15,5 +17,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/userPassword', [AuthController::class, 'updatePassword']);
     Route::get('/myListCards', [MovieController::class, 'myList']);
     Route::get('/mayLike', [MovieController::class, 'mayLike']);
+    Route::match(['GET', 'POST'], '/checkList', [MovieController::class, 'checkList']);
+    Route::match(['GET', 'POST'], '/checkFav', [MovieController::class, 'checkFav']);
+    Route::post('/addMovieList', [MovieController::class, 'addMovieList']);
+    Route::post('/removeMovieList', [MovieController::class, 'removeMovieList']);
+    Route::post('/addMovieFav', [MovieController::class, 'addMovieFav']);
+    Route::post('/removeMovieFav', [MovieController::class, 'removeMovieFav']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
