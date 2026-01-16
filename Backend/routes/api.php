@@ -8,8 +8,14 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/listCardsTending', [MovieController::class, 'listCardsTrending']);
 Route::get('/dramaListCard', [MovieController::class, 'dramaListCard']);
+Route::get('/seriesCards', [MovieController::class, 'seriesCards']);
+Route::get('/seriesGenre', [MovieController::class, 'seriesGenere']);
+Route::get('/moviesCards', [MovieController::class, 'moviesCards']);
+Route::get('/moviesGenre', [MovieController::class, 'moviesGenre']);
 Route::match(['GET', 'POST'], '/moviesDetail', [MovieController::class, 'moviesDetail']);
+Route::match(['GET', 'POST'], '/moviesSuggest', [MovieController::class, 'moviesSuggest']);
 Route::match(['GET', 'POST'], '/seriesDetail', [MovieController::class, 'seriesDetail']);
+Route::match(['GET', 'POST'], '/seriesSuggest', [MovieController::class, 'seriesSuggest']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
