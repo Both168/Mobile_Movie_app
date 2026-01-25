@@ -2,10 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\MovieController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+Route::get('/banner', [BannerController::class, 'index']);
 Route::get('/listCardsTending', [MovieController::class, 'listCardsTrending']);
 Route::get('/dramaListCard', [MovieController::class, 'dramaListCard']);
 Route::get('/seriesCards', [MovieController::class, 'seriesCards']);
