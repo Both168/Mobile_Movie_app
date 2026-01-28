@@ -17,6 +17,7 @@ Route::get('/moviesGenre', [MovieController::class, 'moviesGenre']);
 Route::get('/searchAll', [MovieController::class, 'searchAll']);
 Route::get('/searchSeries', [MovieController::class, 'searchSeries']);
 Route::get('/searchMovies', [MovieController::class, 'searchMovies']);
+Route::post('/view', [MovieController::class, 'incrementView']);
 Route::match(['GET', 'POST'], '/moviesDetail', [MovieController::class, 'moviesDetail']);
 Route::match(['GET', 'POST'], '/moviesSuggest', [MovieController::class, 'moviesSuggest']);
 Route::match(['GET', 'POST'], '/seriesDetail', [MovieController::class, 'seriesDetail']);
