@@ -2,7 +2,8 @@ import { View, StyleSheet, Modal, TouchableOpacity, ActivityIndicator, Dimension
 import { StatusBar } from 'expo-status-bar';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useState, useRef, useEffect } from 'react';
-import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
+import { useEvent, useEventListener } from 'expo';
+import { useVideoPlayer, VideoView, type VideoPlayer } from 'expo-video';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import * as Linking from 'expo-linking';
 import { Colors } from '../constants/Colors';
@@ -20,7 +21,6 @@ interface PlayVideoProps {
 export default function PlayVideo({ videoUrl, visible, onClose, title }: PlayVideoProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-  const videoRef = useRef<Video>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [youtubeVideoId, setYoutubeVideoId] = useState<string | null>(null);
   const [youtubeError, setYoutubeError] = useState<string>('');
@@ -32,6 +32,25 @@ export default function PlayVideo({ videoUrl, visible, onClose, title }: PlayVid
   const [duration, setDuration] = useState(0);
   const controlsOpacity = useRef(new Animated.Value(1)).current;
   const controlsTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const prevDirectUrlRef = useRef<string | null>(null);
+
+  const isDirect = getVideoType(videoUrl) === 'direct';
+  const directVideoSource = visible && isDirect && videoUrl ? videoUrl : null;
+  const player = useVideoPlayer(directVideoSource, (p: VideoPlayer) => {
+    if (directVideoSource) {
+      p.play();
+      p.timeUpdateEventInterval = 0.5;
+    }
+  });
+  const { isPlaying: directIsPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
+  useEventListener(player, 'statusChange', ({ status }) => {
+    if (status === 'error') setError('Failed to play video');
+  });
+  useEventListener(player, 'timeUpdate', () => {
+    setCurrentTime(player.currentTime);
+    setDuration(player.duration);
+  });
+  useEventListener(player, 'sourceLoad', ({ duration: d }) => setDuration(d));
 
   useEffect(() => {
     if (visible && videoUrl) {
@@ -82,22 +101,17 @@ export default function PlayVideo({ videoUrl, visible, onClose, title }: PlayVid
     }
   }, [visible, videoUrl]);
 
-  // Auto-play direct videos when ready
   useEffect(() => {
-    if (videoType === 'direct' && isPlaying && videoRef.current && visible && !loading) {
-      const playVideo = async () => {
-        try {
-          await videoRef.current?.playAsync();
-        } catch (error) {
-          console.error('Error auto-playing video:', error);
-        }
-      };
-      const timer = setTimeout(() => {
-        playVideo();
-      }, 100);
-      return () => clearTimeout(timer);
+    if (visible && isDirect && videoUrl) {
+      if (prevDirectUrlRef.current !== null && prevDirectUrlRef.current !== videoUrl) {
+        player.replace(videoUrl);
+      }
+      player.play();
+      prevDirectUrlRef.current = videoUrl;
+    } else if (!visible) {
+      prevDirectUrlRef.current = null;
     }
-  }, [videoType, isPlaying, visible, loading]);
+  }, [visible, isDirect, videoUrl]);
 
   useEffect(() => {
     if (videoType !== 'youtube' || !youtubeVideoId || youtubeReady || youtubeError) return;
@@ -149,30 +163,16 @@ export default function PlayVideo({ videoUrl, visible, onClose, title }: PlayVid
     }
   };
 
-  const handlePlaybackStatusUpdate = (status: AVPlaybackStatus) => {
-    if (status.isLoaded) {
-      setIsPlaying(status.isPlaying);
-      setCurrentTime(status.positionMillis / 1000);
-      setDuration(status.durationMillis ? status.durationMillis / 1000 : 0);
-      if (status.didJustFinish) {
-        setIsPlaying(false);
-      }
-    }
-  };
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const togglePlayPause = async () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        await videoRef.current.pauseAsync();
-      } else {
-        await videoRef.current.playAsync();
-      }
+  const togglePlayPause = () => {
+    if (videoType === 'direct') {
+      if (directIsPlaying) player.pause();
+      else player.play();
     }
   };
 
@@ -301,17 +301,11 @@ export default function PlayVideo({ videoUrl, visible, onClose, title }: PlayVid
       case 'direct':
         return (
           <View style={styles.videoWrapper}>
-            <Video
-              ref={videoRef}
-              source={{ uri: videoUrl }}
+            <VideoView
+              player={player}
               style={styles.video}
-              resizeMode={ResizeMode.CONTAIN}
-              useNativeControls={false}
-              onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-              onError={(error) => {
-                setError('Failed to play video');
-                console.error('Video error:', error);
-              }}
+              contentFit="contain"
+              nativeControls={false}
             />
             <TouchableOpacity
               style={styles.videoOverlay}
@@ -326,7 +320,7 @@ export default function PlayVideo({ videoUrl, visible, onClose, title }: PlayVid
                     activeOpacity={0.8}
                   >
                     <MaterialIcons
-                      name={isPlaying ? 'pause' : 'play-arrow'}
+                      name={directIsPlaying ? 'pause' : 'play-arrow'}
                       size={56}
                       color="#FFFFFF"
                     />

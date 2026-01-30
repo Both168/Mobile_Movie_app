@@ -8,6 +8,7 @@ import { getSeriesDetail, SeriesDetail, Season, Episode, addMovieToList, removeM
 import { Colors } from '../../constants/Colors';
 import { useRouter } from '../../hooks/useRouter';
 import PlayVideo from '../../components/PlayVideo';
+import { resolveImageUrl } from '../../utils/apiConfig';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const POSTER_HEIGHT = SCREEN_HEIGHT * 0.5;
@@ -231,7 +232,7 @@ export default function SeriesDetailScreen() {
 
       <View style={styles.posterContainer}>
         <Image
-          source={{ uri: series.image }}
+          source={{ uri: resolveImageUrl(series.image) ?? undefined }}
           style={styles.poster}
           resizeMode="cover"
         />
@@ -410,7 +411,7 @@ export default function SeriesDetailScreen() {
                       <View style={styles.episodeTopRow}>
                         <View style={styles.episodeImageContainer}>
                           <Image
-                            source={{ uri: episode.image }}
+                            source={{ uri: resolveImageUrl(episode.image) ?? undefined }}
                             style={styles.episodeImage}
                             resizeMode="cover"
                           />
@@ -447,7 +448,7 @@ export default function SeriesDetailScreen() {
                       <View style={styles.episodeTopRow}>
                         <View style={styles.episodeImageContainer}>
                           <Image
-                            source={{ uri: episode.image }}
+                            source={{ uri: resolveImageUrl(episode.image) ?? undefined }}
                             style={styles.episodeImage}
                             resizeMode="cover"
                           />
@@ -489,7 +490,7 @@ export default function SeriesDetailScreen() {
                             <View style={styles.episodeTopRow}>
                               <View style={styles.episodeImageContainer}>
                                 <Image
-                                  source={{ uri: episode.image }}
+                                  source={{ uri: resolveImageUrl(episode.image) ?? undefined }}
                                   style={styles.episodeImage}
                                   resizeMode="cover"
                                 />

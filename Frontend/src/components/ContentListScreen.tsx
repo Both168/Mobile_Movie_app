@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import BannerSlider from './BannerSlider';
 import { TrendingCard, Pagination, Genre, SeriesResponse, GenreResponse } from '../services/movieService';
 import { Colors } from '../constants/Colors';
+import { resolveImageUrl } from '../utils/apiConfig';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const POSTER_WIDTH = (SCREEN_WIDTH - 60) / 2;
@@ -171,7 +172,7 @@ export default function ContentListScreen({
       activeOpacity={0.8}
     >
       <Image
-        source={{ uri: item.image }}
+        source={{ uri: resolveImageUrl(item.image) ?? undefined }}
         style={styles.poster}
         resizeMode="cover"
       />

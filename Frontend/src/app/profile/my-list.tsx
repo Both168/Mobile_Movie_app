@@ -6,6 +6,7 @@ import BottomTabBar from '../../components/BottomTabBar';
 import { useState, useEffect } from 'react';
 import { getMyListCards, TrendingCard, getMovieDetail, getSeriesDetail } from '../../services/movieService';
 import { ROUTES } from '../../utils/routes';
+import { resolveImageUrl } from '../../utils/apiConfig';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -67,7 +68,7 @@ export default function MyListScreen() {
       activeOpacity={0.8}
     >
       <Image
-        source={{ uri: item.image }}
+        source={{ uri: resolveImageUrl(item.image) ?? undefined }}
         style={styles.poster}
         resizeMode="cover"
       />

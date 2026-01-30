@@ -8,6 +8,7 @@ import { getMovieDetail, getMoviesSuggest, MovieDetail, TrendingCard, addMovieTo
 import { Colors } from '../../constants/Colors';
 import { useRouter } from '../../hooks/useRouter';
 import PlayVideo from '../../components/PlayVideo';
+import { resolveImageUrl } from '../../utils/apiConfig';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const POSTER_HEIGHT = SCREEN_HEIGHT * 0.5;
@@ -220,7 +221,7 @@ export default function MovieDetailScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.posterContainer}>
         <Image
-          source={{ uri: movie.image }}
+          source={{ uri: resolveImageUrl(movie.image) ?? undefined }}
           style={styles.poster}
           resizeMode="cover"
         />
@@ -335,7 +336,7 @@ export default function MovieDetailScreen() {
                   activeOpacity={0.8}
                 >
                   <Image
-                    source={{ uri: suggestedMovie.image }}
+                    source={{ uri: resolveImageUrl(suggestedMovie.image) ?? undefined }}
                     style={styles.suggestedImage}
                     resizeMode="cover"
                   />

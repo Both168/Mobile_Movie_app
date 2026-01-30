@@ -7,6 +7,7 @@ import { useRouter } from '../hooks/useRouter';
 import PlayVideo from './PlayVideo';
 import { getMovieDetail, getSeriesDetail, incrementView } from '../services/movieService';
 import { ROUTES } from '../utils/routes';
+import { resolveImageUrl } from '../utils/apiConfig';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BANNER_HEIGHT = SCREEN_HEIGHT * 0.6;
@@ -176,7 +177,7 @@ export default function BannerSlider({ position }: BannerSliderProps) {
           {banners.map((banner) => (
             <View key={banner.id} style={styles.bannerItem}>
               <Image
-                source={{ uri: banner.image }}
+                source={{ uri: resolveImageUrl(banner.image) ?? undefined }}
                 style={styles.bannerImage}
                 resizeMode="cover"
               />

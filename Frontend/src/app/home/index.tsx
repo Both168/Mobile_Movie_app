@@ -10,6 +10,7 @@ import { Colors } from '../../constants/Colors';
 import Header from '../../components/Header';
 import { useRouter } from '../../hooks/useRouter';
 import { ROUTES } from '../../utils/routes';
+import { resolveImageUrl } from '../../utils/apiConfig';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const POSTER_WIDTH = (SCREEN_WIDTH - 60) / 2;
@@ -169,7 +170,7 @@ export default function HomeScreen() {
       activeOpacity={0.8}
     >
       <Image
-        source={{ uri: item.image }}
+        source={{ uri: resolveImageUrl(item.image) ?? undefined }}
         style={styles.poster}
         resizeMode="cover"
       />

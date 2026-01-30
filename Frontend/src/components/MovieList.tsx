@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions } from 'react-native';
 import { TrendingCard } from '../services/movieService';
+import { resolveImageUrl } from '../utils/apiConfig';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const POSTER_WIDTH = 120;
@@ -33,7 +34,7 @@ export default function MovieList({ title, movies, onMoviePress }: MovieListProp
             activeOpacity={0.8}
           >
             <Image
-              source={{ uri: movie.image }}
+              source={{ uri: resolveImageUrl(movie.image) ?? undefined }}
               style={styles.poster}
               resizeMode="cover"
             />
