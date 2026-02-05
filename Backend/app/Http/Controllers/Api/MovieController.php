@@ -28,7 +28,7 @@ class MovieController extends Controller
             ->where('updated_at', '>=', $oneMonthAgo);
 
         $count = $query->count();
-        
+
         if ($count === 0) {
             $movies = Movie::where('status', 1)
                 ->orderBy('view', 'desc')
@@ -49,7 +49,7 @@ class MovieController extends Controller
                 $attachment = Attachment::find($movie->image);
                 if ($attachment) {
                     $attachmentUrl = $attachment->url();
-                    
+
                     if ($attachmentUrl) {
                         if (strpos($attachmentUrl, '127.0.0.1') !== false || strpos($attachmentUrl, 'localhost') !== false) {
                             $path = parse_url($attachmentUrl, PHP_URL_PATH);
@@ -58,7 +58,7 @@ class MovieController extends Controller
                             $imageUrl = $attachmentUrl;
                         }
                     }
-                    
+
                     if (!$imageUrl || strpos($imageUrl, 'http') !== 0) {
                         $physicalPath = $attachment->physicalPath();
                         if ($physicalPath) {
@@ -68,9 +68,24 @@ class MovieController extends Controller
                 }
             }
 
+            $genreNames = [];
+            if ($movie->genre_id) {
+                $genreIds = collect(explode(',', (string) $movie->genre_id))
+                    ->filter()
+                    ->map(fn ($id) => (int) trim($id))
+                    ->unique()
+                    ->values();
+                if ($genreIds->isNotEmpty()) {
+                    $genreNames = Genre::whereIn('id', $genreIds)->pluck('name')->toArray();
+                }
+            }
+
             return [
                 'id' => $movie->id,
+                'title' => $movie->title ?? '',
+                'description' => $movie->description ?? '',
                 'image' => $imageUrl,
+                'genre' => $genreNames,
             ];
         });
 
@@ -93,7 +108,7 @@ class MovieController extends Controller
         }
 
         $baseUrl = $request->getSchemeAndHttpHost();
-        
+
         $movies = $user->movies()
             ->where('status', 1)
             ->orderBy('created_at', 'desc')
@@ -105,7 +120,7 @@ class MovieController extends Controller
                 $attachment = Attachment::find($movie->image);
                 if ($attachment) {
                     $attachmentUrl = $attachment->url();
-                    
+
                     if ($attachmentUrl) {
                         if (strpos($attachmentUrl, '127.0.0.1') !== false || strpos($attachmentUrl, 'localhost') !== false) {
                             $path = parse_url($attachmentUrl, PHP_URL_PATH);
@@ -114,7 +129,7 @@ class MovieController extends Controller
                             $imageUrl = $attachmentUrl;
                         }
                     }
-                    
+
                     if (!$imageUrl || strpos($imageUrl, 'http') !== 0) {
                         $physicalPath = $attachment->physicalPath();
                         if ($physicalPath) {
@@ -158,7 +173,7 @@ class MovieController extends Controller
                 $attachment = Attachment::find($movie->image);
                 if ($attachment) {
                     $attachmentUrl = $attachment->url();
-                    
+
                     if ($attachmentUrl) {
                         if (strpos($attachmentUrl, '127.0.0.1') !== false || strpos($attachmentUrl, 'localhost') !== false) {
                             $path = parse_url($attachmentUrl, PHP_URL_PATH);
@@ -167,7 +182,7 @@ class MovieController extends Controller
                             $imageUrl = $attachmentUrl;
                         }
                     }
-                    
+
                     if (!$imageUrl || strpos($imageUrl, 'http') !== 0) {
                         $physicalPath = $attachment->physicalPath();
                         if ($physicalPath) {
@@ -219,7 +234,7 @@ class MovieController extends Controller
                 $attachment = Attachment::find($movie->image);
                 if ($attachment) {
                     $attachmentUrl = $attachment->url();
-                    
+
                     if ($attachmentUrl) {
                         if (strpos($attachmentUrl, '127.0.0.1') !== false || strpos($attachmentUrl, 'localhost') !== false) {
                             $path = parse_url($attachmentUrl, PHP_URL_PATH);
@@ -228,7 +243,7 @@ class MovieController extends Controller
                             $imageUrl = $attachmentUrl;
                         }
                     }
-                    
+
                     if (!$imageUrl || strpos($imageUrl, 'http') !== 0) {
                         $physicalPath = $attachment->physicalPath();
                         if ($physicalPath) {
@@ -306,7 +321,7 @@ class MovieController extends Controller
                 $attachment = Attachment::find($movie->image);
                 if ($attachment) {
                     $attachmentUrl = $attachment->url();
-                    
+
                     if ($attachmentUrl) {
                         if (strpos($attachmentUrl, '127.0.0.1') !== false || strpos($attachmentUrl, 'localhost') !== false) {
                             $path = parse_url($attachmentUrl, PHP_URL_PATH);
@@ -315,7 +330,7 @@ class MovieController extends Controller
                             $imageUrl = $attachmentUrl;
                         }
                     }
-                    
+
                     if (!$imageUrl || strpos($imageUrl, 'http') !== 0) {
                         $physicalPath = $attachment->physicalPath();
                         if ($physicalPath) {
@@ -403,7 +418,7 @@ class MovieController extends Controller
                 $attachment = Attachment::find($movie->image);
                 if ($attachment) {
                     $attachmentUrl = $attachment->url();
-                    
+
                     if ($attachmentUrl) {
                         if (strpos($attachmentUrl, '127.0.0.1') !== false || strpos($attachmentUrl, 'localhost') !== false) {
                             $path = parse_url($attachmentUrl, PHP_URL_PATH);
@@ -412,7 +427,7 @@ class MovieController extends Controller
                             $imageUrl = $attachmentUrl;
                         }
                     }
-                    
+
                     if (!$imageUrl || strpos($imageUrl, 'http') !== 0) {
                         $physicalPath = $attachment->physicalPath();
                         if ($physicalPath) {
@@ -501,14 +516,14 @@ class MovieController extends Controller
         }
 
         $baseUrl = $request->getSchemeAndHttpHost();
-        
+
         // Get image URL
         $imageUrl = null;
         if ($movie->image) {
             $attachment = Attachment::find($movie->image);
             if ($attachment) {
                 $attachmentUrl = $attachment->url();
-                
+
                 if ($attachmentUrl) {
                     if (strpos($attachmentUrl, '127.0.0.1') !== false || strpos($attachmentUrl, 'localhost') !== false) {
                         $path = parse_url($attachmentUrl, PHP_URL_PATH);
@@ -517,7 +532,7 @@ class MovieController extends Controller
                         $imageUrl = $attachmentUrl;
                     }
                 }
-                
+
                 if (!$imageUrl || strpos($imageUrl, 'http') !== 0) {
                     $physicalPath = $attachment->physicalPath();
                     if ($physicalPath) {
@@ -535,7 +550,7 @@ class MovieController extends Controller
                 ->map(fn ($id) => (int) trim($id))
                 ->unique()
                 ->values();
-            
+
             if ($genreIds->isNotEmpty()) {
                 $genreNames = Genre::whereIn('id', $genreIds)
                     ->pluck('name')
@@ -638,7 +653,7 @@ class MovieController extends Controller
                 $attachment = Attachment::find($movie->image);
                 if ($attachment) {
                     $attachmentUrl = $attachment->url();
-                    
+
                     if ($attachmentUrl) {
                         if (strpos($attachmentUrl, '127.0.0.1') !== false || strpos($attachmentUrl, 'localhost') !== false) {
                             $path = parse_url($attachmentUrl, PHP_URL_PATH);
@@ -647,7 +662,7 @@ class MovieController extends Controller
                             $imageUrl = $attachmentUrl;
                         }
                     }
-                    
+
                     if (!$imageUrl || strpos($imageUrl, 'http') !== 0) {
                         $physicalPath = $attachment->physicalPath();
                         if ($physicalPath) {
@@ -697,13 +712,13 @@ class MovieController extends Controller
         }
 
         $baseUrl = $request->getSchemeAndHttpHost();
-        
+
         $imageUrl = null;
         if ($series->image) {
             $attachment = Attachment::find($series->image);
             if ($attachment) {
                 $attachmentUrl = $attachment->url();
-                
+
                 if ($attachmentUrl) {
                     if (strpos($attachmentUrl, '127.0.0.1') !== false || strpos($attachmentUrl, 'localhost') !== false) {
                         $path = parse_url($attachmentUrl, PHP_URL_PATH);
@@ -712,7 +727,7 @@ class MovieController extends Controller
                         $imageUrl = $attachmentUrl;
                     }
                 }
-                
+
                 if (!$imageUrl || strpos($imageUrl, 'http') !== 0) {
                     $physicalPath = $attachment->physicalPath();
                     if ($physicalPath) {
@@ -729,7 +744,7 @@ class MovieController extends Controller
                 ->map(fn ($id) => (int) trim($id))
                 ->unique()
                 ->values();
-            
+
             if ($genreIds->isNotEmpty()) {
                 $genreNames = Genre::whereIn('id', $genreIds)
                     ->pluck('name')
@@ -744,7 +759,7 @@ class MovieController extends Controller
                     $episodeAttachment = Attachment::find($episode->image);
                     if ($episodeAttachment) {
                         $episodeAttachmentUrl = $episodeAttachment->url();
-                        
+
                         if ($episodeAttachmentUrl) {
                             if (strpos($episodeAttachmentUrl, '127.0.0.1') !== false || strpos($episodeAttachmentUrl, 'localhost') !== false) {
                                 $path = parse_url($episodeAttachmentUrl, PHP_URL_PATH);
@@ -753,7 +768,7 @@ class MovieController extends Controller
                                 $episodeImageUrl = $episodeAttachmentUrl;
                             }
                         }
-                        
+
                         if (!$episodeImageUrl || strpos($episodeImageUrl, 'http') !== 0) {
                             $physicalPath = $episodeAttachment->physicalPath();
                             if ($physicalPath) {
@@ -873,7 +888,7 @@ class MovieController extends Controller
                 $attachment = Attachment::find($item->image);
                 if ($attachment) {
                     $attachmentUrl = $attachment->url();
-                    
+
                     if ($attachmentUrl) {
                         if (strpos($attachmentUrl, '127.0.0.1') !== false || strpos($attachmentUrl, 'localhost') !== false) {
                             $path = parse_url($attachmentUrl, PHP_URL_PATH);
@@ -882,7 +897,7 @@ class MovieController extends Controller
                             $imageUrl = $attachmentUrl;
                         }
                     }
-                    
+
                     if (!$imageUrl || strpos($imageUrl, 'http') !== 0) {
                         $physicalPath = $attachment->physicalPath();
                         if ($physicalPath) {
@@ -1117,7 +1132,7 @@ class MovieController extends Controller
                 $attachment = Attachment::find($movie->image);
                 if ($attachment) {
                     $attachmentUrl = $attachment->url();
-                    
+
                     if ($attachmentUrl) {
                         if (strpos($attachmentUrl, '127.0.0.1') !== false || strpos($attachmentUrl, 'localhost') !== false) {
                             $path = parse_url($attachmentUrl, PHP_URL_PATH);
@@ -1126,7 +1141,7 @@ class MovieController extends Controller
                             $imageUrl = $attachmentUrl;
                         }
                     }
-                    
+
                     if (!$imageUrl || strpos($imageUrl, 'http') !== 0) {
                         $physicalPath = $attachment->physicalPath();
                         if ($physicalPath) {
